@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from . models import Contact,CommingMessages,GoingMessages,CustomUser
+from . models import Contact,Messages,GoingMessages,CustomUser
 
 # User Serializer
 class UserSerializer(serializers.ModelSerializer):
@@ -26,9 +26,13 @@ class CreatecontactSerializer(serializers.ModelSerializer):
         model = Contact
         fields = ('id','name','userscontact','nickname','phonenumber','dob','Language')
 
-class CommingmessageSerializer(serializers.ModelSerializer):
+class MessageSerializer(serializers.ModelSerializer):
+    sentby = serializers.ReadOnlyField(source='User.id')
+    sentto = serializers.ReadOnlyField(source='User.id')
+
     class Meta:
-        model = CommingMessages
+        model = Messages
+        fields = ('messages','sentby','sentto')
 
 class GoingmessageSerializer(serializers.ModelSerializer):
     class Meta:

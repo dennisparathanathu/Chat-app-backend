@@ -1,7 +1,7 @@
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 from knox.models import AuthToken
-from .serializer import UserSerializer, RegisterSerializer,CustomUserSerializer
+from .serializer import UserSerializer, RegisterSerializer,CustomUserSerializer,MessageSerializer
 from django.contrib.auth import login
 from rest_framework import permissions
 from rest_framework.authtoken.serializers import AuthTokenSerializer
@@ -78,6 +78,17 @@ def getsingleUsers(request,id):
         users_serializer = UserSerializer(user)
         print(users_serializer.data)
         return JsonResponse(users_serializer.data)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def message(request):
+    if request.method =='POST':
+        user_serializer = UserSerializer(user)
+        if user_serializer.is_valid():
+            user_serializer.save()
+            return JsonResponse(user_serializer.data)
+        else:
+            return JsonResponse({"msg":"data is not valid"})
 
 class CustomUserView(APIView):
     parser_class = (FileUploadParser,)

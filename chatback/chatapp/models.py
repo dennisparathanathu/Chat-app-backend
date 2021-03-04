@@ -16,10 +16,10 @@ class Contact(models.Model):
     def __str__(self):
         return self.name
 
-class CommingMessages(models.Model):
-    frommesg = models.CharField(max_length=500)
-    sentby = models.ForeignKey(User, on_delete=models.CASCADE)
-    recivedfrom = models.ForeignKey('Contact',on_delete=models.CASCADE)
+class Messages(models.Model):
+    message = models.CharField(max_length=500)
+    sentby = models.ForeignKey(User, on_delete=models.CASCADE,related_name='sentby')
+    sentto = models.ForeignKey(User,on_delete=models.CASCADE,related_name='sentto')
 
     def __str__(self):
         return self.sentby
