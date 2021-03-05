@@ -9,12 +9,14 @@ from knox.views import LoginView as KnoxLoginView
 from rest_framework.permissions import IsAuthenticated 
 from rest_framework.views import APIView
 from .serializer import CreatecontactSerializer
-from .models import Contact
+from .models import Contact,Newmessages
 from rest_framework.authentication import  TokenAuthentication
 from django.http import JsonResponse
 from rest_framework.decorators import api_view,permission_classes
 from django.contrib.auth.models import User
-from rest_framework.parsers import FileUploadParser
+from rest_framework.parsers import FileUploadParser, JSONParser
+from django.views.decorators.csrf import csrf_exempt
+
 
 
 # Register API
@@ -80,15 +82,18 @@ def getsingleUsers(request,id):
         return JsonResponse(users_serializer.data)
 
 @api_view(['POST'])
+@csrf_exempt
 @permission_classes([IsAuthenticated])
 def message(request):
-    if request.method =='POST':
-        user_serializer = UserSerializer(user)
-        if user_serializer.is_valid():
-            user_serializer.save()
-            return JsonResponse(user_serializer.data)
-        else:
-            return JsonResponse({"msg":"data is not valid"})
+    data = JSONParser().parse(request) 
+    message_serializer = MessageSerializer(data=data['data'])
+    print(data['data'])
+    if message_serializer.is_valid():
+        message_serializer.save()
+
+        return JsonResponse(message_serializer.data)
+    else:
+        return JsonResponse({"msg":"data is not valid"})
 
 class CustomUserView(APIView):
     parser_class = (FileUploadParser,)
@@ -104,3 +109,18 @@ class CustomUserView(APIView):
           return Response(file_serializer.data, status=status.HTTP_201_CREATED)
       else:
           return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def getmessages(request,sid,rid):
+    if request.method =='GET':
+        messages =Newmessages.objects.filter(sentby=sid,sentto=rid)
+        if messages:
+            msg_serializer = MessageSerializer(messages,many=True)
+            print(msg_serializer.data)
+            return JsonResponse(msg_serializer.data,safe=False)
+
+        else:
+            return JsonResponse({"msg":"No conversations"})

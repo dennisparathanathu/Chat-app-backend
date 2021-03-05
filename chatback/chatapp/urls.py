@@ -1,5 +1,5 @@
 from knox import views as knox_views
-from .views import LoginAPI,RegisterAPI,Createcontactview,getallUsers,getuserdetails,getsingleUsers,CustomUserView,message
+from .views import LoginAPI,RegisterAPI,Createcontactview,getallUsers,getuserdetails,getsingleUsers,CustomUserView,message,getmessages
 from django.urls import path
 
 urlpatterns = [
@@ -13,4 +13,5 @@ urlpatterns = [
     path('getsingleusers/<int:id>',getsingleUsers,name="getsingleUsers"),
     path('profileupdate',CustomUserView.as_view(),name='custouserdetails'),
     path('message/',message,name="message"),
+    path('getmessages/<int:sid>/<int:rid>',getmessages,name="getmessages")
 ]
